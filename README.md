@@ -3,6 +3,11 @@ This code is the Pytorch implementation of ICCV 2019 paper [DAFL: Data-Free Lear
 
 We propose a novel framework for training efficient deep neural networks by exploiting generative adversarial networks (GANs). To be specific, the pre-trained teacher networks are regarded as a fixed discriminator and the generator is utilized for derivating training samples which can obtain the maximum response on the discriminator. Then, an efficient network with smaller model size and computational complexity is trained using the generated data and the teacher network, simultaneously. 
 
+<p align="center">
+<img src="figure/figure.jpg" width="800">
+</p>
+
+
 ## Requirements
 - python 3
 - pytorch >= 1.0.0
@@ -29,6 +34,14 @@ To run DAFL on the CIFAR-100 dataset
 python teacher-train.py --dataset cifar100
 python DAFL-train.py --dataset cifar100 --channels 3 --n_epochs 2000 --batch_size 1024 --lr_G 0.02 --latent_dim 1000 --oh 0.5
 ```
+
+## Results
+<img src="figure/Table1.jpg" width="600">
+</p>
+
+<img src="figure/Table2.jpg" width="600">
+</p>
+
 
 ## Citation
 	@inproceedings{DAFL,
