@@ -1,7 +1,16 @@
 # DAFL: Data-Free Learning of Student Networks
-This code is the implementation of ICCVL2019 paper [DAFL: Data-Free Learning of Student Networks](https://arxiv.org/pdf/1904.01186.pdf)
+This code is the Pytorch implementation of ICCV 2019 paper [DAFL: Data-Free Learning of Student Networks](https://arxiv.org/pdf/1904.01186.pdf)
 
-## Run
+We propose a novel framework for training efficient deep neural networks by exploiting generative adversarial networks (GANs). To be specific, the pre-trained teacher networks are regarded as a fixed discriminator and the generator is utilized for derivating training samples which can obtain the maximum response on the discriminator. Then, an efficient network with smaller model size and computational complexity is trained using the generated data and the teacher network, simultaneously. 
+
+## Prerequisites
+```
+python 3.5
+pytorch (>=1.0.0)
+torchvision
+```
+
+## Run the demo
 ```python
 python teacher-train.py
 ```
@@ -30,6 +39,7 @@ python DAFL-train.py --dataset cifar100 --channels 3 --n_epochs 2000 --batch_siz
 		booktitle={ICCV},
 		year={2019}
 	}
+	
 ### Contributing
 We appreciate all contributions. If you are planning to contribute back bug-fixes, please do so without any further discussion.
 
