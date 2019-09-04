@@ -3,31 +3,29 @@ This code is the Pytorch implementation of ICCV 2019 paper [DAFL: Data-Free Lear
 
 We propose a novel framework for training efficient deep neural networks by exploiting generative adversarial networks (GANs). To be specific, the pre-trained teacher networks are regarded as a fixed discriminator and the generator is utilized for derivating training samples which can obtain the maximum response on the discriminator. Then, an efficient network with smaller model size and computational complexity is trained using the generated data and the teacher network, simultaneously. 
 
-## Prerequisites
-```
-python 3.5
-pytorch (>=1.0.0)
-torchvision
-```
+## Requirements
+- python 3
+- pytorch >= 1.0.0
+- torchvision
 
 ## Run the demo
-```python
+```shell
 python teacher-train.py
 ```
 First, you should train a teacher network.
-```python
+```shell
 python DAFL-train.py
 ```
 Then, you can use the DAFL to train a student network without training data on the MNIST dataset.
 
 To run DAFL on the CIFAR-10 dataset
-```python
+```shell
 python teacher-train.py --dataset cifar10
 python DAFL-train.py --dataset cifar10 --channels 3 --n_epochs 2000 --batch_size 1024 --lr_G 0.02 --latent_dim 1000
 ```
 
 To run DAFL on the CIFAR-100 dataset
-```python
+```shell
 python teacher-train.py --dataset cifar100
 python DAFL-train.py --dataset cifar100 --channels 3 --n_epochs 2000 --batch_size 1024 --lr_G 0.02 --latent_dim 1000 --oh 0.5
 ```
@@ -40,7 +38,7 @@ python DAFL-train.py --dataset cifar100 --channels 3 --n_epochs 2000 --batch_siz
 		year={2019}
 	}
 	
-### Contributing
+## Contributing
 We appreciate all contributions. If you are planning to contribute back bug-fixes, please do so without any further discussion.
 
 If you plan to contribute new features, utility functions or extensions to the core, please first open an issue and discuss the feature with us. Sending a PR without discussion might end up resulting in a rejected PR, because we might be taking the core in a different direction than you might be aware of.
