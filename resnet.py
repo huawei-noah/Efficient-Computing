@@ -90,9 +90,9 @@ class ResNet(nn.Module):
         feature = out.view(out.size(0), -1)
         out = self.linear(feature)
         if out_feature == False:
-            return output
+            return out
         else:
-            return output,feature
+            return out,feature
  
  
 def ResNet18(num_classes=10):
