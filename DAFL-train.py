@@ -178,7 +178,7 @@ for epoch in range(opt.n_epochs):
         softmax_o_T = torch.nn.functional.softmax(outputs_T, dim = 1).mean(dim = 0)
         loss_information_entropy = (softmax_o_T * torch.log10(softmax_o_T)).sum()
         loss = loss_one_hot * opt.oh + loss_information_entropy * opt.ie + loss_activation * opt.a
-        loss_kd = kdloss(net(gen_imgs), outputs_T.detach()) 
+        loss_kd = kdloss(net(gen_imgs.detach()), outputs_T.detach()) 
         loss += loss_kd       
         loss.backward()
         optimizer_G.step()
