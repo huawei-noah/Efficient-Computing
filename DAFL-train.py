@@ -139,7 +139,7 @@ if opt.dataset != 'MNIST':
     # Optimizers
     optimizer_G = torch.optim.Adam(generator.parameters(), lr=opt.lr_G)
 
-    optimizer_S = torch.optim.SGD(student.parameters(), lr=opt.lr_S, momentum=0.9, weight_decay=5e-4)
+    optimizer_S = torch.optim.SGD(net.parameters(), lr=opt.lr_S, momentum=0.9, weight_decay=5e-4)
 
 
 def adjust_learning_rate(optimizer, epoch, learing_rate):
