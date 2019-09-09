@@ -26,13 +26,13 @@ Then, you can use the DAFL to train a student network without training data on t
 To run DAFL on the CIFAR-10 dataset
 ```shell
 python teacher-train.py --dataset cifar10
-python DAFL-train.py --dataset cifar10 --channels 3 --n_epochs 2000 --batch_size 1024 --lr_G 0.02 --latent_dim 1000
+python DAFL-train.py --dataset cifar10 --channels 3 --n_epochs 2000 --batch_size 1024 --lr_G 0.02 --lr_S 0.1 --latent_dim 1000  
 ```
 
 To run DAFL on the CIFAR-100 dataset
 ```shell
 python teacher-train.py --dataset cifar100
-python DAFL-train.py --dataset cifar100 --channels 3 --n_epochs 2000 --batch_size 1024 --lr_G 0.02 --latent_dim 1000 --oh 0.5
+python DAFL-train.py --dataset cifar100 --channels 3 --n_epochs 2000 --batch_size 1024 --lr_G 0.02 --lr_S 0.1 --latent_dim 1000 --oh 0.5
 ```
 
 ## Results
