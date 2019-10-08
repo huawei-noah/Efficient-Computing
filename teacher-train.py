@@ -99,8 +99,8 @@ if args.dataset == 'cifar100':
                       train=False,
                       transform=transform_test)
                       
-    data_train_loader = DataLoader(data_train, batch_size=opt.batchsize, shuffle=True, num_workers=0)
-    data_test_loader = DataLoader(data_test, batch_size=opt.batchsize, num_workers=0)
+    data_train_loader = DataLoader(data_train, batch_size=128, shuffle=True, num_workers=0)
+    data_test_loader = DataLoader(data_test, batch_size=128, num_workers=0)
     net = resnet.ResNet34(num_classes=100).cuda()
     criterion = torch.nn.CrossEntropyLoss().cuda()
     optimizer = torch.optim.SGD(net.parameters(), lr=0.1, momentum=0.9, weight_decay=5e-4)
