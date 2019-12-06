@@ -36,7 +36,7 @@ prior: The estimated class prior in unlabeled dataset.
 
 ## Results
 <p align="center">
-<img src="figure/result.PNG" width="600">
+<img src="https://github.com/huawei-noah/DAFL/blob/master/pu_compress/figure/result.PNG" width="600">
 </p>
 
 You should get at least 93.75% accuracy on CIFAR-10 dataset when using the default parameter.
