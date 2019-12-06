@@ -17,7 +17,10 @@ We propose a novel framework for training efficient deep neural networks with li
 
 This is a demo by using 2% of the CIFAR-10 dataset to compress network. ImageNet dataset is regarded as unlabeled dataset. The teacher network is a pre-trained ResNet-34, and the student network is ResNet-18.
 
-In order to run the demo code, you first need to download CIFAR-10 dataset as the positive dataset and ImageNet dataset as the unlabeled dataset. Besides, a pre-trained ResNet-34 model is used as the teacher model with can be downloaded at: http://xxxxxxxxx
+In order to run the demo code, you first need to download CIFAR-10 dataset as the positive dataset and ImageNet dataset as the unlabeled dataset. Besides, a pre-trained ResNet-34 model is used as the teacher model with can be downloaded at:  
+
+https://pan.baidu.com/s/1qw4136eq-kiC8tmtnDwUTA 
+code: mvxp
 
 The datasets and the pre-trained model should be placed in the '/cache/' folder. And then run:
 
