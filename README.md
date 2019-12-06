@@ -1,5 +1,5 @@
 # Data-Efficient Compression
-This code is the Pytorch implementation of 
+This repo is the Pytorch implementation of 
 
 ## DAFL
 ICCV 2019 paper [DAFL: Data-Free Learning of Student Networks](https://arxiv.org/pdf/1904.01186.pdf)
