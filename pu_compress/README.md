@@ -4,7 +4,7 @@ This code is the Pytorch implementation of NeurIPS 2019 paper [Positive-Unlabele
 We propose a novel framework for training efficient deep neural networks with little training data by using positive-unlabeled (PU) learning method and robust knowledge distillation (RKD) method. To be specific, PU learning method enlarge the training dataset by selecting positive data from unlabeled set, and then the enlarged training set is used to compress the teacher network using RKD method.
 
 <p align="center">
-<img src="figure/1.PNG" width="800">
+<img src="https://github.com/huawei-noah/DAFL/blob/master/pu_compress/figure/1.PNG" width="800">
 </p>
 
 
