@@ -1,4 +1,4 @@
-# Data-Efficient Compression
+# Data-Efficient Neural Network Compression
 This repo is the Pytorch implementation of 
 
 ## DAFL
