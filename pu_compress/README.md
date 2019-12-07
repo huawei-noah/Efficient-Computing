@@ -45,7 +45,7 @@ You should get about 93.75% accuracy on CIFAR-10 dataset when using the default 
 ## Citation
 	@inproceedings{xu2019positive,
 	  title={Positive-Unlabeled Compression on the Cloud},
-	  author={Xu, Yixing and Wang, Yunhe and Zeng, Jia and Han, Kai and Chunjing, XU and Tao, Dacheng and Xu, Chang},
+	  author={Xu, Yixing and Wang, Yunhe and Chen, Hanting and Han, Kai and Chunjing, XU and Tao, Dacheng and Xu, Chang},
 	  booktitle={Advances in Neural Information Processing Systems},
 	  pages={2561--2570},
 	  year={2019}
