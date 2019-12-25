@@ -29,6 +29,6 @@ PU Compression is a compression method with little training data. More details c
 | ---------- | --- | --- | --- | 
 | Teacher |  Original Data |  98.9 | 95.6 |
 | Student  | Original Data | 98.9 | 94.4 |
-| [data-free KD](https://arxiv.org/abs/1710.07535) |  Meta Data  |  92.5 | -- |
+| [Meta-data](https://arxiv.org/abs/1710.07535) |  Meta Data  |  92.5 | -- |
 | PU Compression |  PU Data (1/500) | 98.9 |  93.8 |
 | DAFL |  No Data | 98.2 | 92.2 |
