@@ -23,7 +23,7 @@ NeurIPS 2019 paper [Positive-Unlabeled Compression on the Cloud](https://arxiv.o
 
 PU Compression is a compression method with little training data. More details can be found at [pu_compress](https://github.com/huawei-noah/DAFL/tree/master/pu_compress).
 
-# Leadboard
+# Leaderboard
 
 |    Method    | Used Data |  Acc. (MNIST) |  Acc. (CIFAR-10) |
 | ---------- | --- | --- | --- | 
