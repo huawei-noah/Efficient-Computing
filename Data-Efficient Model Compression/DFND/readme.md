@@ -21,7 +21,7 @@ First, you should train a teacher network.
 ```shell
 python DFND-train.py
 ```
-Then, you can use the DAFL to train a student network without training data on the MNIST dataset.
+Then, you can use the DAFL to train a student network without training data.
 
 To run DAFL on the CIFAR-10 dataset
 ```shell
