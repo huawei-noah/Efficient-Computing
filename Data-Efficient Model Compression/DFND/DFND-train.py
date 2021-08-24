@@ -20,56 +20,41 @@ import warnings
 warnings.filterwarnings('ignore')
 import argparse
 parser = argparse.ArgumentParser()
-parser.add_argument('--num_select', type=int, default=50000)
-parser.add_argument('--dataset', type=str, default='cifar100', choices=['cifar10','cifar100'])
+parser.add_argument('--num_select', type=int, default=600000)
+parser.add_argument('--data_cifar', type=str, default='/cache/data/cifar/')
+parser.add_argument('--data_imagenet', type=str, default='/cache/data/imagenet/train')
+parser.add_argument('--teacher_dir', type=str, default='/cache/models/')
+parser.add_argument('--dataset', type=str, default='cifar10', choices=['cifar10','cifar100'])
 parser.add_argument('--epochs', type=float, default=800)
-parser.add_argument('--weights', type=int, default=1)
-parser.add_argument('--adaptation', type=int, default=1)
-parser.add_argument('--moxfile', type=int, default=1, help='temp save dir')
-parser.add_argument('--use_ori', type=int, default=0, help='temp save dir')
 args,_ = parser.parse_known_args()
 
-if args.moxfile == 1:
-    import moxing as mox
-    mox.file.copy_parallel('s3://bucket-2707/hankai/data/imagenet/train/','/cache/imagenet/train/')
-    if args.dataset == 'cifar100':
-        mox.file.copy_parallel('s3://bucket-2707/chenhanting/models/cifar-ResNet34','/cache/models/cifar100-ResNet34')
-        mox.file.copy_parallel('s3://bucket-2707/chenhanting/data/cifar-100-python/','/cache/data/cifar-100-python/')
-    if args.dataset == 'cifar10':
-        mox.file.copy_parallel('s3://bucket-2707/chenhanting/models/cifar10-ResNet34','/cache/models/cifar10-ResNet34')
-        mox.file.copy_parallel('s3://bucket-2707/chenhanting/data/cifar-10-python/','/cache/data/cifar-10-python/')
-        
 
 acc = 0
 acc_best = 0
 
-teacher = torch.nn.DataParallel(ResNet34(100)).cuda()
-if args.dataset == 'cifar100':
-    teacher.load_state_dict(torch.load('/cache/models/cifar100-ResNet34'))
-if args.dataset == 'cifar10':
-    teacher= torch.load('/cache/models/cifar10-ResNet34').module
+teacher = torch.load(opt.teacher_dir + 'teacher').cuda()
 teacher.eval()
 for parameter in teacher.parameters():
     parameter.requires_grad = False
 
-def kdloss(y, teacher_scores, weights, T=2):
+def kdloss(y, teacher_scores, T=4):
     weights = weights.unsqueeze(1)
     p = F.log_softmax(y/T, dim=1)
     q = F.softmax(teacher_scores/T, dim=1)
     l_kl = F.kl_div(p, q, reduce=False)
-    loss = torch.sum(l_kl*weights) / y.shape[0]
+    loss = torch.sum(l_kl) / y.shape[0]
     return loss * (T**2)
 
 
 normalize = transforms.Normalize(mean=[0.485, 0.456, 0.406],
                                  std=[0.229, 0.224, 0.225])
-data_train = ImageFolder('/cache/imagenet/train/', transforms.Compose([
+data_train = ImageFolder(args.data_imagenet, transforms.Compose([
     transforms.Resize((32,32)),
     transforms.ToTensor(),
     normalize,
 ]))
 
-data_train_transform = ImageFolder('/cache/imagenet/train/', transforms.Compose([
+data_train_transform = ImageFolder(args.data_imagenet, transforms.Compose([
     transforms.Resize((32,32)),
     transforms.RandomCrop(32, padding=4),
     transforms.RandomHorizontalFlip(),
@@ -91,23 +76,19 @@ transform_test = transforms.Compose([
 ])
 
 if args.dataset == 'cifar100':
-    data_ori_train = CIFAR100('/cache/data/',
-                       transform=transform_train)
-    data_test = CIFAR100('/cache/data/',
+    data_test = CIFAR100(args.data_cifar,
                       train=False,
                       transform=transform_test)
     teacher_acc = torch.tensor([0.7774])
     n_classes = 100
 if args.dataset == 'cifar10':
-    data_ori_train = CIFAR10('/cache/data/cifar-10-python/',
-                       transform=transform_train)
-    data_test = CIFAR10('/cache/data/cifar-10-python/',
+    data_test = CIFAR10(args.data_cifar,
                       train=False,
                       transform=transform_test)
     teacher_acc = torch.tensor([0.9523])
     n_classes = 10
     
-data_train_loader = DataLoader(data_ori_train, batch_size=512, num_workers=0)
+
 data_test_loader = DataLoader(data_test, batch_size=1000, num_workers=0)
 
 noise_adaptation = torch.nn.Parameter(torch.zeros(n_classes,n_classes-1))
@@ -148,7 +129,7 @@ def identify_outlier():
         pred_list.append(pred)
     return torch.cat(value,dim=0), torch.cat(pred_list,dim=0) 
     
-def train(epoch, trainloader, class_weights, nll):
+def train(epoch, trainloader, nll):
     net.train()
     loss_list, batch_list = [], []
     for i, (images, labels) in enumerate(trainloader):
@@ -161,16 +142,12 @@ def train(epoch, trainloader, class_weights, nll):
         
         output_t = teacher(images).detach()
         pred = output_t.data.max(1)[1]
-
-        preds_t = pred.cpu().data.numpy()
-        weights = torch.from_numpy(class_weights[preds_t]).float().cuda()
             
-        loss = kdloss(output, output_t, weights)         
-        
-        if args.adaptation == 1:        
-            output_s = F.softmax(output, dim=1)
-            output_s_adaptation = torch.matmul(output_s, noisy(noise_adaptation))
-            loss += nll(torch.log(output_s_adaptation), pred)
+        loss = kdloss(output, output_t)         
+               
+        output_s = F.softmax(output, dim=1)
+        output_s_adaptation = torch.matmul(output_s, noisy(noise_adaptation))
+        loss += nll(torch.log(output_s_adaptation), pred)
 
         loss_list.append(loss.data.item())
         batch_list.append(i+1)
@@ -222,67 +199,22 @@ def adjust_learning_rate(optimizer, epoch, max_epoch):
 def main():
     global acc_best
     
-    if args.use_ori == 1:
-        trainloader3 = torch.utils.data.DataLoader(data_ori_train, batch_size=256, shuffle=True, num_workers=32)
-        class_weights = np.array([1]*n_classes)
-        nll = torch.nn.NLLLoss(weight = torch.from_numpy(class_weights).float()).cuda()
-    else:
+    value, pred = identify_outlier()
+    positive_index = value.topk(args.num_select,largest=False)[1]
+    nll = torch.nn.NLLLoss().cuda()
+    positive_index = positive_index.tolist()
 
-        value, pred = identify_outlier()
+    data_train_select = torch.utils.data.Subset(data_train_transform, positive_index)
+    trainloader3 = torch.utils.data.DataLoader(data_train_select, batch_size=256, shuffle=True, num_workers=32)
+    epoch = int(40000/args.num_select * 512)
 
-        #positive_index = []
-        #for i in range(10):
-        #    pred_index_temp = ((pred==i).nonzero())
-        #    print(len(pred_index_temp))
-        #    positive_index_temp = value[pred_index_temp].view(-1).topk(20000,largest=False)[1]
-        #    positive_index.append(pred_index_temp[positive_index_temp])
-        #positive_index = torch.cat(positive_index,dim=0).view(-1).tolist()
-
-        positive_index = value.topk(args.num_select,largest=False)[1]
-
-        if args.weights == 0:
-            class_weights = np.array([1]*n_classes)
-        else:
-            num_class = np.array([len((pred[positive_index]==i).nonzero())+1 for i in range(n_classes)])
-            num_class = num_class/np.sum(num_class)
-            class_weights = 1/num_class
-            weights_sum = np.sum(class_weights)
-            class_weights /= weights_sum
-            class_weights *= n_classes
-        print(class_weights)
-
-        nll = torch.nn.NLLLoss(weight = torch.from_numpy(class_weights).float()).cuda()
-
-        positive_index = positive_index.tolist()
-        #import random
-        #positive_index = random.sample(range(len(data_train+data_ori_train)), 60000)
-        #positive_index = range(len(data_ori_train))
-        print(len(positive_index))
-        print(len(data_train))
-        #print((torch.Tensor(positive_index)<len(data_ori_train)).sum().tolist())
-
-        #positive_index = range(60000)
-        data_train_select = torch.utils.data.Subset(data_train, positive_index)
-        trainloader3 = torch.utils.data.DataLoader(data_train_select, batch_size=256, shuffle=True, num_workers=32)
-    epoch = int(50000.0/args.num_select * args.epochs) * 2
-    print(epoch)
     for e in range(1, epoch):
         adjust_learning_rate(optimizer, e, epoch)
-        train_and_test(e, trainloader3, class_weights, nll)
-        if acc == acc_best:
-            #torch.save(net,'/tmp/data/chenhanting/resnet20_student')
-            print('nice')
-            if args.adaptation == 1:
-                torch.save(noise_adaptation, '/cache/models/noise_adaptation')
-                mox.file.copy_parallel('/cache/models/noise_adaptation','s3://bucket-2707/chenhanting/models/noise_adaptation_' + args.dataset)
-    #print(num)
+        train_and_test(e, trainloader3, nll)
     print(acc_best)
-    acc_best = 0
 
 
 if __name__ == '__main__':
     main()
-    #for i in [300000, 400000, 500000, 600000, 700000]:
-    #    main_fun(i)
         
     
