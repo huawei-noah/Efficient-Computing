@@ -27,7 +27,7 @@ PU Compression is a compression method with little training data. More details c
 CVPR 2021 paper [Learning Student Networks in the Wild](https://openaccess.thecvf.com/content/CVPR2021/papers/Chen_Learning_Student_Networks_in_the_Wild_CVPR_2021_paper.pdf).
 
 <p align="center">
-<img src="DFND/figure/1.PNG" width="600">
+<img src="DFND/figure/figure.jpg" width="600">
 </p>
 
 DAFL is a compression method using only unlabeled training data. More details can be found at [DFND](https://github.com/huawei-noah/Efficient-Computing/tree/master/Data-Efficient%20Model%20Compression/DFND).
