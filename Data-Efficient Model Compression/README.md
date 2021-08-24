@@ -23,6 +23,15 @@ NeurIPS 2019 paper [Positive-Unlabeled Compression on the Cloud](https://arxiv.o
 
 PU Compression is a compression method with little training data. More details can be found at [pu_compress](https://github.com/huawei-noah/DAFL/tree/master/pu_compress).
 
+## DFND
+CVPR 2021 paper [Learning Student Networks in the Wild](https://openaccess.thecvf.com/content/CVPR2021/papers/Chen_Learning_Student_Networks_in_the_Wild_CVPR_2021_paper.pdf).
+
+<p align="center">
+<img src="pu_compress/figure/1.PNG" width="600">
+</p>
+
+DAFL is a compression method using only unlabeled training data. More details can be found at [DFND](https://github.com/huawei-noah/Efficient-Computing/tree/master/Data-Efficient%20Model%20Compression/DFND).
+
 # Leaderboard
 
 |    Method    | Used Data |  Acc. (MNIST) |  Acc. (CIFAR-10) |
@@ -32,3 +41,4 @@ PU Compression is a compression method with little training data. More details c
 | [Meta-data](https://arxiv.org/abs/1710.07535) |  Meta Data  |  92.5 | -- |
 | PU Compression |  PU Data (1/500) | 98.9 |  93.8 |
 | DAFL |  No Data | 98.2 | 92.2 |
+| DFND |  Unlabeled Data | - | 94.0 |
