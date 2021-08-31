@@ -12,7 +12,7 @@ ICCV 2019 paper [DAFL: Data-Free Learning of Student Networks](https://arxiv.org
 <img src="DAFL/figure/figure.jpg" width="800">
 </p>
 
-DAFL is a compression method without using training data. More details can be found at [DAFL](https://github.com/huawei-noah/Efficient-Computing/tree/master/Data-Efficient%20Model%20Compression/DAFL).
+DAFL is a compression method without using training data. More details can be found at [DAFL](https://github.com/huawei-noah/Efficient-Computing/tree/master/Data-Efficient-Model-Compression/DAFL).
 
 ## PU Compression
 NeurIPS 2019 paper [Positive-Unlabeled Compression on the Cloud](https://arxiv.org/pdf/1909.09757.pdf).
@@ -21,7 +21,7 @@ NeurIPS 2019 paper [Positive-Unlabeled Compression on the Cloud](https://arxiv.o
 <img src="pu_compress/figure/1.PNG" width="600">
 </p>
 
-PU Compression is a compression method with little training data. More details can be found at [pu_compress](https://github.com/huawei-noah/Efficient-Computing/tree/master/Data-Efficient%20Model%20Compression/pu_compress).
+PU Compression is a compression method with little training data. More details can be found at [pu_compress](https://github.com/huawei-noah/Efficient-Computing/tree/master/Data-Efficient-Model-Compression/pu_compress).
 
 ## DFND
 CVPR 2021 paper [Learning Student Networks in the Wild](https://openaccess.thecvf.com/content/CVPR2021/papers/Chen_Learning_Student_Networks_in_the_Wild_CVPR_2021_paper.pdf).
@@ -30,7 +30,7 @@ CVPR 2021 paper [Learning Student Networks in the Wild](https://openaccess.thecv
 <img src="DFND/figure/figure.jpg" width="600">
 </p>
 
-DAFL is a compression method using only unlabeled training data. More details can be found at [DFND](https://github.com/huawei-noah/Efficient-Computing/tree/master/Data-Efficient%20Model%20Compression/DFND).
+DAFL is a compression method using only unlabeled training data. More details can be found at [DFND](https://github.com/huawei-noah/Efficient-Computing/tree/master/Data-Efficient-Model-Compression/DFND).
 
 # Leaderboard
 
