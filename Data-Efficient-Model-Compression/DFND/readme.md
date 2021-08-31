@@ -21,15 +21,15 @@ First, you should train a teacher network.
 ```shell
 python DFND-train.py
 ```
-Then, you can use the DAFL to train a student network without training data.
+Then, you can use the DFND to train a student network without training data.
 
-To run DAFL on the CIFAR-10 dataset
+To run DFND on the CIFAR-10 dataset
 ```shell
 python teacher-train.py --dataset cifar10
 python DAFL-train.py --dataset cifar10 
 ```
 
-To run DAFL on the CIFAR-100 dataset
+To run DFND on the CIFAR-100 dataset
 ```shell
 python teacher-train.py --dataset cifar100
 python DAFL-train.py --dataset cifar100 
