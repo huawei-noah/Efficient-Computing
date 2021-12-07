@@ -39,7 +39,7 @@ CVPR 2021 paper [Data-Free Knowledge Distillation For Image Super-Resolution ](h
 <img src="DFSR/figure/figure.png" width="800">
 </p>
 
-DFSR is data-free knowledge distillation framework for image super-resolution. More details can be found at [DFSR](https://github.com/huawei-noah/Efficient-Computing/tree/master/Data-Efficient-Model-Compression/DFSR).
+DFSR is a data-free knowledge distillation framework for image super-resolution. More details can be found at [DFSR](https://github.com/huawei-noah/Efficient-Computing/tree/master/Data-Efficient-Model-Compression/DFSR).
 
 # Leaderboard
 
