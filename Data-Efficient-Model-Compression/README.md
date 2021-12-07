@@ -27,10 +27,19 @@ PU Compression is a compression method with little training data. More details c
 CVPR 2021 paper [Learning Student Networks in the Wild](https://openaccess.thecvf.com/content/CVPR2021/papers/Chen_Learning_Student_Networks_in_the_Wild_CVPR_2021_paper.pdf).
 
 <p align="center">
-<img src="DFND/figure/figure.jpg" width="600">
+<img src="DFND/figure/figure.jpg" width="500">
 </p>
 
-DAFL is a compression method using only unlabeled training data. More details can be found at [DFND](https://github.com/huawei-noah/Efficient-Computing/tree/master/Data-Efficient-Model-Compression/DFND).
+DFND is a compression method using only unlabeled training data. More details can be found at [DFND](https://github.com/huawei-noah/Efficient-Computing/tree/master/Data-Efficient-Model-Compression/DFND).
+
+## DFSR
+CVPR 2021 paper [Data-Free Knowledge Distillation For Image Super-Resolution ](https://openaccess.thecvf.com/content/CVPR2021/papers/Zhang_Data-Free_Knowledge_Distillation_for_Image_Super-Resolution_CVPR_2021_paper.pdf).
+
+<p align="center">
+<img src="DFSR/figure/figure.png" width="800">
+</p>
+
+DFSR is data-free knowledge distillation framework for image super-resolution. More details can be found at [DFSR](https://github.com/huawei-noah/Efficient-Computing/tree/master/Data-Efficient-Model-Compression/DFSR).
 
 # Leaderboard
 
