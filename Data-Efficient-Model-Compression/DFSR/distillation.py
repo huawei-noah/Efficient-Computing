@@ -1,3 +1,9 @@
+#Copyright (C) 2021. Huawei Technologies Co., Ltd. All rights reserved.
+
+#This program is free software; you can redistribute it and/or modify it under the terms of the BSD 3-Clause License.
+
+#This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the BSD 3-Clause License for more details.
+
 import os, sys
 os.system("pip install torch==1.0.0")
 os.system("pip install torchtext==0.3.1")
@@ -28,8 +34,7 @@ matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 
 from zsnet import TVLoss, GeneratorINE1
-from gan import GeneratorB as Gen
-from bicubic import *
+from bicubic import * # bicubic package from https://github.com/tonyzzzt/bicubic-interpolation-pytorch-version-the-same-results-with-matlab-imresize/blob/master/bicubic.py
 
 # Training settings
 parser = argparse.ArgumentParser(description="PyTorch VDSR")

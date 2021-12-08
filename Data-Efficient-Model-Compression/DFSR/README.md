@@ -11,6 +11,8 @@ We propose a new data-free knowledge distillation framework for super-resolution
 - python3
 - pytorch
 - torchvision
+- [bicubic.py](https://github.com/tonyzzzt/bicubic-interpolation-pytorch-version-the-same-results-with-matlab-imresize/blob/master/bicubic.py)
+
 
 ## Run the demo
 

@@ -1,3 +1,6 @@
+# 2020.09.24-Changed number of channels for model
+#            Huawei Technologies Co., Ltd. <foss@huawei.com>
+
 import torch
 import torch.nn as nn
 from math import sqrt

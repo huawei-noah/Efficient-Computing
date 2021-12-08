@@ -1,3 +1,9 @@
+#Copyright (C) 2021. Huawei Technologies Co., Ltd. All rights reserved.
+
+#This program is free software; you can redistribute it and/or modify it under the terms of the BSD 3-Clause License.
+
+#This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the BSD 3-Clause License for more details.
+
 import os, sys
 os.system("pip install torch==1.0.0")
 os.system("pip install torchtext==0.3.1")

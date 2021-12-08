@@ -4,13 +4,15 @@ Warranty Disclaimer
 THE OPEN SOURCE SOFTWARE IN THIS SOFTWARE IS DISTRIBUTED IN THE HOPE THAT IT WILL BE USEFUL, BUT WITHOUT ANY WARRANTY, WITHOUT EVEN THE IMPLIED WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE. SEE THE APPLICABLE LICENSES FOR MORE DETAILS.
 
 Copyright Notice and License Texts
-Software: pytorch-cifar
+Software: pytorch-vdsr
 Copyright notice: 
 Copyright (c) 2017
 
 License: MIT License
 
-Copyright (c) 2017 liukuang
+Copyright (c) 2017-     Jiu XU
+Copyright (c) 2017-     Rakuten, Inc
+Copyright (c) 2017-     Rakuten Institute of Technology
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -29,3 +31,4 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+
