@@ -1,6 +1,7 @@
 # Dynamic Quantization
 
 Instance-Aware Dynamic Neural Network Quantization, CVPR 2022.
+
 By Zhenhua Liu, Yunhe Wang, Kai Han, Siwei Ma and Wen Gao.
 
 <img width="518" alt="搜狗截图22年08月03日1525_1" src="https://user-images.githubusercontent.com/19202799/182549238-2cc1db63-e504-483f-8a2e-ff51d94974cb.png">
