@@ -197,9 +197,6 @@ def main_worker(gpu, ngpus_per_node, args):
     optimizer = torch.optim.SGD(model.parameters(), args.lr,
                                 momentum=args.momentum,
                                 weight_decay=args.weight_decay)
-    # # lr_scheduler = torch.optim.lr_scheduler.MultiStepLR(optimizer, 
-    #                                                     milestones=[30, 60, 85, 95], 
-    #                                                     last_epoch=args.start_epoch-1)
 
     # optionally resume from a checkpoint
     if args.resume:
@@ -211,11 +208,7 @@ def main_worker(gpu, ngpus_per_node, args):
                 # Map model to be loaded to specified single gpu.
                 loc = 'cuda:{}'.format(args.gpu)
                 checkpoint = torch.load(args.resume, map_location=loc)
-#             args.start_epoch = checkpoint['epoch']
-#             best_acc1 = checkpoint['best_acc1']
-#             if args.gpu is not None:
-#                 # best_acc1 may be from a checkpoint from a different GPU
-#                 best_acc1 = best_acc1.to(args.gpu)
+                
             new_state_dict = {}
             for k, v in checkpoint.items():
                 if 'module'in k:
@@ -283,7 +276,6 @@ def main_worker(gpu, ngpus_per_node, args):
 
         # train for one epoch
         train(train_loader, model, criterion, optimizer, epoch, scheduler, args)
-        # lr_scheduler.step()
 
         if not args.multiprocessing_distributed or (args.multiprocessing_distributed
                 and args.rank % ngpus_per_node == 0):            
