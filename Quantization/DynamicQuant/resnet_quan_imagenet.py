@@ -143,7 +143,6 @@ class Bottleneck(nn.Module):
         if self.downsample is not None:
             residual = self.downsample[0](x, one_hot)
             residual = self.downsample[1](residual)
-            # residual = self.downsample(x)
 
         out += residual
         out = self.relu(out)
@@ -196,7 +195,7 @@ class ResNet(nn.Module):
         for i in range(1, blocks):
             layers.append(block(self.inplanes, planes, name_w, name_a, nbit_w, nbit_a))
 
-        return layers #nn.Sequential(*layers)
+        return layers
 
     def forward(self, x):
         x = self.conv1(x)
@@ -219,11 +218,6 @@ class ResNet(nn.Module):
             x = m(x, one_hot)
         for m in self.layer4:
             x = m(x, one_hot)
-
-        # x = self.layer1(x)
-        # x = self.layer2(x)
-        # x = self.layer3(x)
-        # x = self.layer4(x)
 
         x = self.avgpool(x)
         x = x.view(x.size(0), -1)
@@ -290,17 +284,3 @@ def resnet152(pretrained=False, **kwargs):
     if pretrained:
         model.load_state_dict(model_zoo.load_url(model_urls['resnet152']))
     return model
-
-
-if __name__ == '__main__':
-    use_gpu = True
-    batch_size = 1
-    resolution = 1024
-    x = torch.randn(batch_size, 3, resolution, resolution)
-#     model = resnet18(width=1)
-    model = resnet50(width=1)
-    if use_gpu:
-        x = x.cuda()
-        model = model.cuda()
-    model.eval()
-    print(model)
