@@ -15,8 +15,7 @@ class Signer(Function):
     '''
     @staticmethod
     def forward(ctx, input):
-#         return torch.sign(input)
-        return (input>=0).float()*2-1
+        return torch.sign(input)
 
     @staticmethod
     def backward(ctx, grad_output):
@@ -43,20 +42,6 @@ class Quantizer(Function):
         ctx.scale = scale
         return torch.round(input * scale) / scale if offset is None \
                 else (torch.round(input * scale) + torch.round(offset)) / scale
-#         if alpha is None:
-#             scale = 2 ** nbit - 1
-#             ctx.scale = scale
-#             if offset is None:                
-#                 return torch.round(input * scale) / scale
-#             else:
-#                 return (torch.round(input * scale) + offset) / scale
-#         else:
-#             scale = (2 ** nbit - 1) / alpha
-#             if offset is None:                
-#                 return torch.round(input * scale) / scale
-#             else:
-#                 ctx.save_for_backward(input, scale)
-#                 return (torch.round(input * scale) + offset) / scale
 
     @staticmethod
     def backward(ctx, grad_output):
@@ -78,7 +63,6 @@ class ScaleSigner(Function):
     @staticmethod
     def forward(ctx, input):
         return torch.sign(input) * torch.mean(torch.abs(input))
-#         return ((input>=0).float()*2-1) * torch.mean(torch.abs(input))
 
     @staticmethod
     def backward(ctx, grad_output):
@@ -108,7 +92,7 @@ def pact_a(input, nbit_a, alpha, *args, **kwargs):
 
 
 class DynamicQConv(nn.Conv2d):
-    # general QuanConv for quantized conv
+    # dynamic quantization for quantized conv
     def __init__(self, in_channels, out_channels, kernel_size, quan_name_w, quan_name_a, nbit_w=32, nbit_a=32, has_offset=False, 
                  stride=1, padding=0, dilation=1, groups=1, bias=True):
         super(DynamicQConv, self).__init__(
@@ -121,7 +105,7 @@ class DynamicQConv(nn.Conv2d):
         name_a_dict = {'dorefa': dorefa_a, 'pact': pact_a}
         self.quan_w = name_w_dict[quan_name_w]
         self.quan_a = name_a_dict[quan_name_a]
-        #self.alpha = None
+        
         if quan_name_a == 'pact':
             self.alpha_a = nn.Parameter(torch.Tensor(1), requires_grad=True)
         else:
@@ -134,7 +118,6 @@ class DynamicQConv(nn.Conv2d):
             self.offset = nn.Parameter(torch.Tensor(1))
         else:
             self.register_parameter('offset', None)
-#         print(quan_name_w, quan_name_a, nbit_w, nbit_a)
         
         if bias:
             self.bias = nn.Parameter(torch.Tensor(out_channels))
@@ -166,7 +149,6 @@ class DynamicQConv(nn.Conv2d):
                 return x
         # w quan
         if self.nbit_w < 32:
-            # w = self.quan_w(self.weight, self.nbit_w, self.alpha_w, self.offset)
             w0 = self.quan_w(self.weight, self.nbit_w-1, self.alpha_w, self.offset)
             w1 = self.quan_w(self.weight, self.nbit_w, self.alpha_w, self.offset)
             w2 = self.quan_w(self.weight, self.nbit_w+1, self.alpha_w, self.offset)
@@ -174,7 +156,6 @@ class DynamicQConv(nn.Conv2d):
             w = self.weight
         # a quan
         if self.nbit_a < 32:
-            # x = self.quan_a(input, self.nbit_a, self.alpha_a)
             x0 = self.quan_a(input, self.nbit_a-1, self.alpha_a)
             x1 = self.quan_a(input, self.nbit_a, self.alpha_a)
             x2 = self.quan_a(input, self.nbit_a+1, self.alpha_a)
@@ -191,7 +172,7 @@ class DynamicQConv(nn.Conv2d):
 
 
 class QuanConv(nn.Conv2d):
-    # general QuanConv for quantized conv
+    # general quantization for quantized conv
     def __init__(self, in_channels, out_channels, kernel_size, quan_name_w, quan_name_a, nbit_w=32, nbit_a=32, 
                  stride=1, padding=0, dilation=1, groups=1, bias=True, has_offset=False):
         super(QuanConv, self).__init__(
@@ -204,7 +185,7 @@ class QuanConv(nn.Conv2d):
         name_a_dict = {'dorefa': dorefa_a, 'pact': pact_a}
         self.quan_w = name_w_dict[quan_name_w]
         self.quan_a = name_a_dict[quan_name_a]
-        #self.alpha = None
+        
         if quan_name_a == 'pact':
             self.alpha_a = nn.Parameter(torch.Tensor(1), requires_grad=True)
         else:
@@ -217,7 +198,7 @@ class QuanConv(nn.Conv2d):
             self.offset = nn.Parameter(torch.Tensor(1))
         else:
             self.register_parameter('offset', None)
-#         print(quan_name_w, quan_name_a, nbit_w, nbit_a)
+
         
         if bias:
             self.bias = nn.Parameter(torch.Tensor(out_channels))
