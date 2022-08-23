@@ -170,7 +170,6 @@ class ResNet(nn.Module):
         self.fc1 = nn.Linear(64*8*8, 64)
         self.dropout = nn.Dropout(0.2)
         self.fc2 = nn.Linear(64, num_bits*num_layers)
-        self.gumbelsoftmax = GumbleSoftmax()
         self.num_layers = num_layers
         self.block_layers = block_layers
         self.num_bits = num_bits
@@ -213,7 +212,6 @@ class ResNet(nn.Module):
         feat = self.dropout(feat)
         feat = self.fc2(feat)
         feat = torch.reshape(feat, (-1, self.num_layers, self.num_bits))
-        one_hot = self.gumbelsoftmax(feat, temp=1, force_hard=True)
         one_hot = F.gumbel_softmax(feat, tau=1, hard=True)
         
         i = 0
