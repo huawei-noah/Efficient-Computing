@@ -86,12 +86,10 @@ parser.add_argument('--multiprocessing-distributed', action='store_true',
                          'N processes per node, which has N GPUs. This is the '
                          'fastest way to use PyTorch for either single node or '
                          'multi node data parallel training')
-# ours
 parser.add_argument('--width', default=1, type=float, help='width')
 parser.add_argument('--r', default=1, type=float, help='ratio (default: 2)')
 parser.add_argument('--lr_scheduler', default='MultiStep', type=str,
                     help='lr scheduler')
-# for cloud
 parser.add_argument('--init_method', type=str, help='init_method')
 parser.add_argument('--num_gpus', default=4, 
                     type=int, metavar='N',
@@ -331,7 +329,7 @@ def train(train_loader, model, criterion, optimizer, epoch, scheduler, args):
 
         # compute output
         output, one_hot = model(images)
-        bit = torch.sum(torch.sum(one_hot,0) * bit_list) / one_hot.size(0)
+        bit = torch.mean(torch.sum(one_hot*bit_list, 2))
         loss = criterion(output, target) + args.alpha * torch.clamp(bit-args.tar_bit, min=0.0)
 
         # measure accuracy and record loss
@@ -380,7 +378,7 @@ def validate(val_loader, model, criterion, args):
 
             # compute output
             output,one_hot = model(images)
-            bit = torch.sum(torch.sum(one_hot,0) * bit_list) / one_hot.size(0)
+            bit = torch.mean(torch.sum(one_hot*bit_list, 2))
             loss = criterion(output, target) + args.alpha * torch.clamp(bit-args.tar_bit, min=0.0)
 
             # measure accuracy and record loss
