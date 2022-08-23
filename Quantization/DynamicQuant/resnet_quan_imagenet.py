@@ -61,15 +61,15 @@ class BasicBlock(nn.Module):
     def forward(self, x, one_hot):
         residual = x
 
-        out = self.conv1(x, one_hot)
+        out = self.conv1(x, one_hot[:,0,:].squeeze())
         out = self.bn1(out)
         out = self.relu(out)
 
-        out = self.conv2(out, one_hot)
+        out = self.conv2(out, one_hot[:,1,:].squeeze())
         out = self.bn2(out)
 
         if self.downsample is not None:
-            residual = self.downsample[0](x, one_hot)
+            residual = self.downsample[0](x)
             residual = self.downsample[1](residual)
 
         out += residual
@@ -101,8 +101,7 @@ class BasicBlock_Quan(nn.Module):
         out = self.bn2(out)
 
         if self.downsample is not None:
-            residual = self.downsample[0](x)
-            residual = self.downsample[1](residual)
+            residual = self.downsample(x)
 
         out += residual
         out = self.relu(out)
@@ -129,20 +128,19 @@ class Bottleneck(nn.Module):
     def forward(self, x, one_hot):
         residual = x
 
-        out = self.conv1(x, one_hot)
+        out = self.conv1(x, one_hot[:,0,:].squeeze())
         out = self.bn1(out)
         out = self.relu(out)
 
-        out = self.conv2(out, one_hot)
+        out = self.conv2(out, one_hot[:,1,:].squeeze())
         out = self.bn2(out)
         out = self.relu(out)
 
-        out = self.conv3(out, one_hot)
+        out = self.conv3(out, one_hot[:,2,:].squeeze())
         out = self.bn3(out)
 
         if self.downsample is not None:
-            residual = self.downsample[0](x, one_hot)
-            residual = self.downsample[1](residual)
+            residual = self.downsample(x)
 
         out += residual
         out = self.relu(out)
@@ -151,7 +149,7 @@ class Bottleneck(nn.Module):
 
 class ResNet(nn.Module):
 
-    def __init__(self, block, layers, name_w, name_a, nbit_w, nbit_a, num_bits=3, num_classes=1000, width=1.):
+    def __init__(self, block, layers, name_w, name_a, nbit_w, nbit_a, num_layers, block_layers, num_bits=3, num_classes=1000, width=1.):
         self.inplanes = int(64*width)
         super(ResNet, self).__init__()
         self.conv1 = Conv(3, int(64*width), kernel_size=7, stride=2, padding=3,
@@ -171,8 +169,12 @@ class ResNet(nn.Module):
         self.avgpool_policy = nn.AvgPool2d((7,7))
         self.fc1 = nn.Linear(64*8*8, 64)
         self.dropout = nn.Dropout(0.2)
-        self.fc2 = nn.Linear(64, num_bits)
-
+        self.fc2 = nn.Linear(64, num_bits*num_layers)
+        self.gumbelsoftmax = GumbleSoftmax()
+        self.num_layers = num_layers
+        self.block_layers = block_layers
+        self.num_bits = num_bits
+        
         for m in self.modules():
             if isinstance(m, Conv):
                 n = m.kernel_size[0] * m.kernel_size[1] * m.out_channels
@@ -185,7 +187,7 @@ class ResNet(nn.Module):
         downsample = None
         if stride != 1 or self.inplanes != planes * block.expansion:
             downsample = nn.ModuleList()
-            downsample.append(MyConv(self.inplanes, planes * block.expansion, 
+            downsample.append(QuanConv(self.inplanes, planes * block.expansion, 
                               1, name_w, name_a, nbit_w, nbit_a, stride=stride, bias=False))
             downsample.append(nn.BatchNorm2d(planes * block.expansion))
 
@@ -195,7 +197,7 @@ class ResNet(nn.Module):
         for i in range(1, blocks):
             layers.append(block(self.inplanes, planes, name_w, name_a, nbit_w, nbit_a))
 
-        return layers
+        return layers #nn.Sequential(*layers)
 
     def forward(self, x):
         x = self.conv1(x)
@@ -210,15 +212,21 @@ class ResNet(nn.Module):
         feat = self.fc1(feat.view(x.size(0),-1))
         feat = self.dropout(feat)
         feat = self.fc2(feat)
-        one_hot = F.gumbel_softmax(feat, tau=1, hard=True, eps=1e-20)
+        feat = torch.reshape(feat, (-1, self.num_layers, self.num_bits))
+        one_hot = self.gumbelsoftmax(feat, temp=1, force_hard=True)
+        one_hot = F.gumbel_softmax(feat, tau=1, hard=True)
         
+        i = 0
         for m in self.layer2:
-            x = m(x, one_hot)
+            x = m(x, one_hot[:,i:i+self.block_layers,:])
+            i += self.block_layers
         for m in self.layer3:
-            x = m(x, one_hot)
+            x = m(x, one_hot[:,i:i+self.block_layers,:])
+            i += self.block_layers
         for m in self.layer4:
-            x = m(x, one_hot)
-
+            x = m(x, one_hot[:,i:i+self.block_layers,:])
+            i += self.block_layers
+            
         x = self.avgpool(x)
         x = x.view(x.size(0), -1)
         x = self.dropout(x)
@@ -226,61 +234,13 @@ class ResNet(nn.Module):
         return x, one_hot
 
 
-def resnet18(pretrained=False, name_w='pact', name_a='pact', nbit_w=4, nbit_a=4, **kwargs):
+def resnet18(pretrained=False, name_w='pact', name_a='pact', nbit_w=4, nbit_a=4, num_layers=12, block_layers=2, **kwargs):
     """Constructs a ResNet-18 model.
 
     Args:
         pretrained (bool): If True, returns a model pre-trained on ImageNet
     """
-    model = ResNet(BasicBlock, [2, 2, 2, 2], name_w, name_a, nbit_w, nbit_a, **kwargs)
+    model = ResNet(BasicBlock, [2, 2, 2, 2], name_w, name_a, nbit_w, nbit_a, num_layers, block_layers, **kwargs)
     if pretrained:
         model.load_state_dict(model_zoo.load_url(model_urls['resnet18']))
-    return model
-
-
-def resnet34(pretrained=False, **kwargs):
-    """Constructs a ResNet-34 model.
-
-    Args:
-        pretrained (bool): If True, returns a model pre-trained on ImageNet
-    """
-    model = ResNet(BasicBlock, [3, 4, 6, 3], **kwargs)
-    if pretrained:
-        model.load_state_dict(model_zoo.load_url(model_urls['resnet34']))
-    return model
-
-
-def resnet50(pretrained=False, **kwargs):
-    """Constructs a ResNet-50 model.
-
-    Args:
-        pretrained (bool): If True, returns a model pre-trained on ImageNet
-    """
-    model = ResNet(Bottleneck, [3, 4, 6, 3], **kwargs)
-    if pretrained:
-        model.load_state_dict(model_zoo.load_url(model_urls['resnet50']))
-    return model
-
-
-def resnet101(pretrained=False, **kwargs):
-    """Constructs a ResNet-101 model.
-
-    Args:
-        pretrained (bool): If True, returns a model pre-trained on ImageNet
-    """
-    model = ResNet(Bottleneck, [3, 4, 23, 3], **kwargs)
-    if pretrained:
-        model.load_state_dict(model_zoo.load_url(model_urls['resnet101']))
-    return model
-
-
-def resnet152(pretrained=False, **kwargs):
-    """Constructs a ResNet-152 model.
-
-    Args:
-        pretrained (bool): If True, returns a model pre-trained on ImageNet
-    """
-    model = ResNet(Bottleneck, [3, 8, 36, 3], **kwargs)
-    if pretrained:
-        model.load_state_dict(model_zoo.load_url(model_urls['resnet152']))
     return model
