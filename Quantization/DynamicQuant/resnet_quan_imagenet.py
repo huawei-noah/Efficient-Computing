@@ -101,7 +101,8 @@ class BasicBlock_Quan(nn.Module):
         out = self.bn2(out)
 
         if self.downsample is not None:
-            residual = self.downsample(x)
+            residual = self.downsample[0](x)
+            residual = self.downsample[1](residual)
 
         out += residual
         out = self.relu(out)
@@ -140,7 +141,8 @@ class Bottleneck(nn.Module):
         out = self.bn3(out)
 
         if self.downsample is not None:
-            residual = self.downsample(x)
+            residual = self.downsample[0](x)
+            residual = self.downsample[1](residual)
 
         out += residual
         out = self.relu(out)
