@@ -19,7 +19,7 @@ python train.py /path/to/imagenet --arch resnet18 --tar_bit 4
 
 To evaluate the model:
 ```
-python train.py /path/to/imagenet --resume /path/to/resume --arch resnet18 --tar_bit 4 --evaluate
+python train.py /path/to/imagenet --resume /path/to/resume --arch resnet18 --tar_bit 4 --batch-size 512 --evaluate
 ```
 
 ## Results
