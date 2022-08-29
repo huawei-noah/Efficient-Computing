@@ -213,8 +213,9 @@ class ResNet(nn.Module):
         feat = self.fc1(feat.view(x.size(0),-1))
         feat = self.dropout(feat)
         feat = self.fc2(feat)
-        feat = torch.reshape(feat, (-1, self.num_layers, self.num_bits))
+        feat = feat.view(-1, self.num_bits)
         one_hot = F.gumbel_softmax(feat, tau=1, hard=True)
+        one_hot = one_hot.view(-1, self.num_layers, self.num_bits)
         
         i = 0
         for m in self.layer2:
