@@ -26,9 +26,9 @@ python train.py /path/to/imagenet --resume /path/to/resume --arch resnet18 --tar
 
 | Model | Bit | DoReFa | DoReFa+DQ |
 |-- | --| --|--|
-| ResNet-18| 4 | 68.1 | 69.23 |
+| ResNet-18| 4 | 68.1 | 69.44 |
 
-Download checkpoints: [BaiduDisk](https://pan.baidu.com/s/1VrXoFBL78x0_a_67y6j_Xg), passward: [lly0]().
+Download checkpoints: [BaiduDisk](https://pan.baidu.com/s/1asLAU_FTx1Ol5usT8UBW4w), passward: [83c6]().
 
 ## Citations
 
