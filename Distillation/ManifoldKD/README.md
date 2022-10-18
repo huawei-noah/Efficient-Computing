@@ -6,7 +6,7 @@
 
 This paper utilizes the patch-level information and propose a fine-grained manifold distillation method for transformer-based networks.
 
-![](figs/overview.png)
+![images](https://github.com/ggjy/Efficient-Computing/blob/master/Distillation/ManifoldKD/figs/overview.png)
 
 ## Usage
 
