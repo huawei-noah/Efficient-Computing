@@ -1,7 +1,7 @@
 # Gold-YOLO: Efficient Object Detector via Gather-and-Distribute Mechanism
 
 <div align=center>
-<img src="./assets/fps-trt7.png" alt="fps-trt7" width = "550" /> <img src="./assets/fps-trt8.png" alt="fps-8" width = "550" />
+<img src="./assets/fps-trt7.png" alt="fps-trt7" width = "430" /> <img src="./assets/fps-trt8.png" alt="fps-8" width = "430" />
 </div>
 
 
