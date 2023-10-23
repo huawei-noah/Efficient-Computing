@@ -54,7 +54,7 @@ class Trainer:
         self.num_classes = self.data_dict['nc']
         self.train_loader, self.val_loader = self.get_data_loader(args, cfg, self.data_dict)
         # get model and optimizer
-        self.distill_ns = True if self.args.distill and self.cfg.model.type in ['YOLOv6n', 'YOLOv6s'] else False
+        self.distill_ns = True if self.args.distill and self.cfg.model.type in ['YOLOv6n', 'YOLOv6s', 'GoldYOLO-n', 'GoldYOLO-s'] else False
         model = self.get_model(args, cfg, self.num_classes, device)
         if self.args.distill:
             if self.args.fuse_ab:
@@ -297,7 +297,7 @@ class Trainer:
                                                   iou_type=self.cfg.model.head.iou_type,
                                                   fpn_strides=self.cfg.model.head.strides)
         if self.args.distill:
-            if self.cfg.model.type in ['YOLOv6n', 'YOLOv6s']:
+            if self.cfg.model.type in ['YOLOv6n', 'YOLOv6s', 'GoldYOLO-n', 'GoldYOLO-s']:
                 Loss_distill_func = ComputeLoss_distill_ns
             else:
                 Loss_distill_func = ComputeLoss_distill
