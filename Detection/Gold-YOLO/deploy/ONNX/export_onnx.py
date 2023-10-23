@@ -17,6 +17,7 @@ from yolov6.models.effidehead import Detect
 from yolov6.layers.common import *
 from yolov6.utils.events import LOGGER
 from yolov6.utils.checkpoint import load_checkpoint
+from gold_yolo.switch_tool import switch_to_deploy
 from io import BytesIO
 
 
@@ -48,6 +49,7 @@ if __name__ == '__main__':
     assert not (device.type == 'cpu' and args.half), '--half only compatible with GPU export, i.e. use --device 0'
     # Load PyTorch model
     model = load_checkpoint(args.weights, map_location=device, inplace=True, fuse=True)  # load FP32 model
+    model = switch_to_deploy(model)
     for layer in model.modules():
         if isinstance(layer, RepVGGBlock):
             layer.switch_to_deploy()
