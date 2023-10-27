@@ -41,23 +41,30 @@ for k, v in ExifTags.TAGS.items():
         break
 
 
+def img2label_paths(img_paths):
+    # Define label paths as a function of image paths
+    sa, sb = f'{os.sep}images{os.sep}', f'{os.sep}labels{os.sep}'  # /images/, /labels/ substrings
+    return [sb.join(x.rsplit(sa, 1)).rsplit('.', 1)[0] + '.txt' for x in img_paths]
+
+
 class TrainValDataset(Dataset):
     '''YOLOv6 train_loader/val_loader, loads images and labels for training and validation.'''
+
     def __init__(
-        self,
-        img_dir,
-        img_size=640,
-        batch_size=16,
-        augment=False,
-        hyp=None,
-        rect=False,
-        check_images=False,
-        check_labels=False,
-        stride=32,
-        pad=0.0,
-        rank=-1,
-        data_dict=None,
-        task="train",
+            self,
+            img_dir,
+            img_size=640,
+            batch_size=16,
+            augment=False,
+            hyp=None,
+            rect=False,
+            check_images=False,
+            check_labels=False,
+            stride=32,
+            pad=0.0,
+            rank=-1,
+            data_dict=None,
+            task="train",
     ):
         assert task.lower() in ("train", "val", "test", "speed"), f"Not supported task: {task}"
         t1 = time.time()
@@ -65,7 +72,7 @@ class TrainValDataset(Dataset):
         self.main_process = self.rank in (-1, 0)
         self.task = self.task.capitalize()
         self.class_names = data_dict["names"]
-        self.img_paths, self.labels = self.get_imgs_labels(self.img_dir)
+        self.img_paths, self.labels = self.get_imgs_labels(self.img_dir, task)
         if self.rect:
             shapes = [self.img_info[p]["shape"] for p in self.img_paths]
             self.shapes = np.array(shapes, dtype=np.float64)
@@ -114,7 +121,8 @@ class TrainValDataset(Dataset):
                 else self.img_size
             )  # final letterboxed shape
             if self.hyp and "letterbox_return_int" in self.hyp:
-                img, ratio, pad = letterbox(img, shape, auto=False, scaleup=self.augment, return_int=self.hyp["letterbox_return_int"])
+                img, ratio, pad = letterbox(img, shape, auto=False, scaleup=self.augment,
+                                            return_int=self.hyp["letterbox_return_int"])
             else:
                 img, ratio, pad = letterbox(img, shape, auto=False, scaleup=self.augment)
 
@@ -127,16 +135,16 @@ class TrainValDataset(Dataset):
                 # new boxes
                 boxes = np.copy(labels[:, 1:])
                 boxes[:, 0] = (
-                    w * (labels[:, 1] - labels[:, 3] / 2) + pad[0]
+                        w * (labels[:, 1] - labels[:, 3] / 2) + pad[0]
                 )  # top left x
                 boxes[:, 1] = (
-                    h * (labels[:, 2] - labels[:, 4] / 2) + pad[1]
+                        h * (labels[:, 2] - labels[:, 4] / 2) + pad[1]
                 )  # top left y
                 boxes[:, 2] = (
-                    w * (labels[:, 1] + labels[:, 3] / 2) + pad[0]
+                        w * (labels[:, 1] + labels[:, 3] / 2) + pad[0]
                 )  # bottom right x
                 boxes[:, 3] = (
-                    h * (labels[:, 2] + labels[:, 4] / 2) + pad[1]
+                        h * (labels[:, 2] + labels[:, 4] / 2) + pad[1]
                 )  # bottom right y
                 labels[:, 1:] = boxes
 
@@ -215,19 +223,47 @@ class TrainValDataset(Dataset):
             l[:, 0] = i  # add target image index for build_targets()
         return torch.stack(img, 0), torch.cat(label, 0), path, shapes
 
-    def get_imgs_labels(self, img_dir):
+    def get_imgs_labels(self, path, task):
+        valid_img_record = ''
+        # assert osp.exists(path), f"{path} is an invalid directory path!"
+        try:
+            f = []  # image files
+            for p in path if isinstance(path, list) else [path]:
+                p = Path(p)  # os-agnostic
+                if p.is_dir():  # dir
+                    f += glob.glob(str(p / '**' / '*.*'), recursive=True)
+                    valid_img_record = osp.join(
+                        osp.dirname(path), "." + osp.basename(path) + ".json"
+                    )
+                    # f = list(p.rglob('*.*'))  # pathlib
+                elif p.is_file():  # file
+                    with open(p) as t:
+                        t = t.read().strip().splitlines()
+                        parent = str(p.parent) + os.sep
+                        f += [x.replace('./', parent, 1) if x.startswith('./') else x for x in t]  # to global path
+                        # f += [p.parent / x.lstrip(os.sep) for x in t]  # to global path (pathlib)
+                    valid_img_record = osp.join(
+                        osp.dirname(osp.abspath(osp.join(path, '..'))), "." + osp.basename(path) + ".json"
+                    )
+                else:
+                    raise FileNotFoundError(f'{task}{p} does not exist')
+            img_paths = sorted(
+                x.replace('/', os.sep) for x in f if x.split('.')[-1].lower() in IMG_FORMATS and os.path.isfile(x))
+            # self.img_files = sorted([x for x in f if x.suffix[1:].lower() in IMG_FORMATS])  # pathlib
+            assert img_paths, f'{task} No images found'
+        except Exception as e:
+            raise Exception(f'{task}Error loading data from {path}') from e
 
-        assert osp.exists(img_dir), f"{img_dir} is an invalid directory path!"
-        valid_img_record = osp.join(
-            osp.dirname(img_dir), "." + osp.basename(img_dir) + ".json"
-        )
+        # valid_img_record = osp.join(
+        #     osp.dirname(path), "." + osp.basename(path) + ".json"
+        # )
         NUM_THREADS = min(8, os.cpu_count())
 
-        img_paths = glob.glob(osp.join(img_dir, "**/*"), recursive=True)
-        img_paths = sorted(
-            p for p in img_paths if p.split(".")[-1].lower() in IMG_FORMATS and os.path.isfile(p)
-        )
-        assert img_paths, f"No images found in {img_dir}."
+        # img_paths = glob.glob(osp.join(path, "**/*"), recursive=True)
+        # img_paths = sorted(
+        #     p for p in img_paths if p.split(".")[-1].lower() in IMG_FORMATS and os.path.isfile(p)
+        # )
+        assert img_paths, f"No images found in {path}."
 
         img_hash = self.get_hash(img_paths)
         if osp.exists(valid_img_record):
@@ -269,33 +305,32 @@ class TrainValDataset(Dataset):
                 json.dump(cache_info, f)
 
         # check and load anns
-        base_dir = osp.basename(img_dir)
-        if base_dir != "":
-            label_dir = osp.join(
-            osp.dirname(osp.dirname(img_dir)), "labels", osp.basename(img_dir)
-            )
-            assert osp.exists(label_dir), f"{label_dir} is an invalid directory path!"
-        else:
-            sub_dirs= []
-            label_dir = img_dir
-            for rootdir, dirs, files in os.walk(label_dir):
-                for subdir in dirs:
-                    sub_dirs.append(subdir)
-            assert "labels" in sub_dirs, f"Could not find a labels directory!"
-
+        # base_dir = osp.basename(path)
+        # if base_dir != "":
+        #     label_dir = osp.join(
+        #         osp.dirname(osp.dirname(path)), "labels", osp.basename(path)
+        #     )
+        #     assert osp.exists(label_dir), f"{label_dir} is an invalid directory path!"
+        # else:
+        #     sub_dirs = []
+        #     label_dir = path
+        #     for rootdir, dirs, files in os.walk(label_dir):
+        #         for subdir in dirs:
+        #             sub_dirs.append(subdir)
+        #     assert "labels" in sub_dirs, f"Could not find a labels directory!"
 
         # Look for labels in the save relative dir that the images are in
-        def _new_rel_path_with_ext(base_path: str, full_path: str, new_ext: str):
-            rel_path = osp.relpath(full_path, base_path)
-            return osp.join(osp.dirname(rel_path), osp.splitext(osp.basename(rel_path))[0] + new_ext)
+        # def _new_rel_path_with_ext(base_path: str, full_path: str, new_ext: str):
+        #     rel_path = osp.relpath(full_path, base_path)
+        #     return osp.join(osp.dirname(rel_path), osp.splitext(osp.basename(rel_path))[0] + new_ext)
 
-
-        img_paths = list(img_info.keys())
-        label_paths = sorted(
-            osp.join(label_dir, _new_rel_path_with_ext(img_dir, p, ".txt"))
-            for p in img_paths
-        )
-        assert label_paths, f"No labels found in {label_dir}."
+        # img_paths = list(img_info.keys())
+        # label_paths = sorted(
+        #     osp.join(label_dir, _new_rel_path_with_ext(path, p, ".txt"))
+        #     for p in img_paths
+        # )
+        label_paths = img2label_paths(img_paths)
+        assert label_paths, f"No labels found in {task}."
         label_hash = self.get_hash(label_paths)
         if "label_hash" not in cache_info or cache_info["label_hash"] != label_hash:
             self.check_labels = True
@@ -312,13 +347,13 @@ class TrainValDataset(Dataset):
                 )
                 pbar = tqdm(pbar, total=len(label_paths)) if self.main_process else pbar
                 for (
-                    img_path,
-                    labels_per_file,
-                    nc_per_file,
-                    nm_per_file,
-                    nf_per_file,
-                    ne_per_file,
-                    msg,
+                        img_path,
+                        labels_per_file,
+                        nc_per_file,
+                        nm_per_file,
+                        nf_per_file,
+                        ne_per_file,
+                        msg,
                 ) in pbar:
                     if nc_per_file == 0:
                         img_info[img_path]["labels"] = labels_per_file
@@ -344,17 +379,18 @@ class TrainValDataset(Dataset):
                 )
 
         if self.task.lower() == "val":
-            if self.data_dict.get("is_coco", False): # use original json file when evaluating on coco dataset.
-                assert osp.exists(self.data_dict["anno_path"]), "Eval on coco dataset must provide valid path of the annotation file in config file: data/coco.yaml"
+            if self.data_dict.get("is_coco", False):  # use original json file when evaluating on coco dataset.
+                assert osp.exists(self.data_dict[
+                                      "anno_path"]), "Eval on coco dataset must provide valid path of the annotation file in config file: data/coco.yaml"
             else:
                 assert (
                     self.class_names
                 ), "Class names is required when converting labels to coco format for evaluating."
-                save_dir = osp.join(osp.dirname(osp.dirname(img_dir)), "annotations")
+                save_dir = osp.join(osp.dirname(osp.dirname(path)), "annotations")
                 if not osp.exists(save_dir):
                     os.mkdir(save_dir)
                 save_path = osp.join(
-                    save_dir, "instances_" + osp.basename(img_dir) + ".json"
+                    save_dir, "instances_" + osp.basename(path) + ".json"
                 )
                 TrainValDataset.generate_coco_format_labels(
                     img_info, self.class_names, save_path
@@ -445,10 +481,10 @@ class TrainValDataset(Dataset):
             elif mini > 1:
                 shapes[i] = [1, 1 / mini]
         self.batch_shapes = (
-            np.ceil(np.array(shapes) * self.img_size / self.stride + self.pad).astype(
-                np.int_
-            )
-            * self.stride
+                np.ceil(np.array(shapes) * self.img_size / self.stride + self.pad).astype(
+                    np.int_
+                )
+                * self.stride
         )
 
     @staticmethod
@@ -506,10 +542,10 @@ class TrainValDataset(Dataset):
                         len(l) == 5 for l in labels
                     ), f"{lb_path}: wrong label format."
                     assert (
-                        labels >= 0
+                            labels >= 0
                     ).all(), f"{lb_path}: Label values error: all values in label file must > 0"
                     assert (
-                        labels[:, 1:] <= 1
+                            labels[:, 1:] <= 1
                     ).all(), f"{lb_path}: Label values error: all coordinates must be normalized"
 
                     _, indices = np.unique(labels, axis=0, return_index=True)
@@ -597,7 +633,7 @@ class LoadData:
     def __init__(self, path, webcam, webcam_addr):
         self.webcam = webcam
         self.webcam_addr = webcam_addr
-        if webcam: # if use web camera
+        if webcam:  # if use web camera
             imgp = []
             vidp = [int(webcam_addr) if webcam_addr.isdigit() else webcam_addr]
         else:
@@ -650,11 +686,11 @@ class LoadData:
             self.count += 1
             img = cv2.imread(path)  # BGR
         return img, path, self.cap
-        
+
     def add_video(self, path):
         self.frame = 0
         self.cap = cv2.VideoCapture(path)
         self.frames = int(self.cap.get(cv2.CAP_PROP_FRAME_COUNT))
-        
+
     def __len__(self):
         return self.nf  # number of files
