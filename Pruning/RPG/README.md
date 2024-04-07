@@ -35,7 +35,7 @@ BibTex Formatted Citation:
 | 80       | 76.66              | [Link](https://drive.google.com/file/d/1-x3f_PIcSZkmhv7-X9vBpXN-zSp7W9F3/view?usp=drive_link) | [Link (PIN:1234)](https://pan.baidu.com/s/1AUqzU4uA7RW9gQRCssXOeg) |
 | 90       | 75.80              | [Link](https://drive.google.com/file/d/10-nz5vYoE-qXp0nhAJ_9CYeHLJEr2CXI/view?usp=drive_link) | [Link (PIN:1234)](https://pan.baidu.com/s/11rwVrwtc-mnL87tnShbaBw) |
 | 95       | 74.05              | [Link](https://drive.google.com/file/d/107NmBo_DP_Niit6QxAF0qhdkcnXi6hDC/view?usp=drive_link) | [Link (PIN:1234)](https://pan.baidu.com/s/1w-ykBeGa1ZNw04rzbLWC-A) |
-| 98       | 69.57              | [Link](https://drive.google.com/file/d/1-mXDm0qyCANxD2-Y-oqf-Obi-omWq1UT/view?usp=drive_link) | [Link (PIN:1234)](https://pan.baidu.com/s/1XGG75o5tineDiJ6YIFkvow) |
+| 98       | 69.57              | [Link](https://drive.google.com/file/d/18rKbxYtWhzDBqp8Bc8fUHib_fu77WMop/view?usp=sharing) | [Link (PIN:1234)](https://pan.baidu.com/s/1qJRZSNgZYjzOYpMTfYzcCw) |
 
 **ResNet-50 Pruned from Scratch**
 
