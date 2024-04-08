@@ -1,4 +1,4 @@
 torchvision
 timm
-torch==1.8
+torch==1.13.1
 pynvml
