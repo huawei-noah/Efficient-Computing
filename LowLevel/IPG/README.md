@@ -4,7 +4,7 @@
 <a href="https://openaccess.thecvf.com/content/CVPR2024/html/Tian_Image_Processing_GNN_Breaking_Rigidity_in_Super-Resolution_CVPR_2024_paper.html" alt="arXiv">
     <img src="https://img.shields.io/badge/CVPR'24-Oral-b31b31b.svg?style=flat" /></a>
 </p>
-This is the official repo of our paper ["Image Processing GNN: Breaking Rigidity in Super-Resolution"](https://openaccess.thecvf.com/content/CVPR2024/papers/Tian_Image_Processing_GNN_Breaking_Rigidity_in_Super-Resolution_CVPR_2024_paper.pdf). We proposed IPG, a Graph-based SR model that achieves outstanding performance on various SR benchmarks.
+This is the official repo of our paper Image Processing GNN: Breaking Rigidity in Super-Resolution. We propose IPG, a Graph-based SR model that achieves outstanding performance on various SR benchmarks.
 
 Code & weights will be released soon (we are sorry that we cannot release codes and weights in time due to code-checks within the corporation; but we will release it asap after the check is completed). Stay tuned!
 
