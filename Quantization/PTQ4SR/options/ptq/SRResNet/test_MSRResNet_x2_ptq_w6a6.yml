@@ -1,0 +1,124 @@
+name: MSRResNet_x2_ptq_w6a6
+model_type: SRModel
+scale: 2
+num_gpu: 1  # set num_gpu: 0 for cpu mode
+manual_seed: 0
+
+datasets:
+  stage1_dbdc:
+    name: DIV2K
+    type: PairedImageDataset
+    dataroot_gt: datasets/DIV2K_sample/DIV2K_train_HR_sub
+    dataroot_lq: datasets/DIV2K_sample/DIV2K_train_LR_bicubic/X2_sub
+    io_backend:
+      type: disk
+
+    gt_size: 192
+    use_hflip: false
+    use_rot: false
+
+    # data loader
+    num_worker_per_gpu: 6
+    batch_size_per_gpu: 16
+
+    prefetch_mode: ~
+  stage2_paq:
+    name: DIV2K
+    type: PairedImageDataset
+    dataroot_gt: datasets/DIV2K_sample/DIV2K_train_HR_sub
+    dataroot_lq: datasets/DIV2K_sample/DIV2K_train_LR_bicubic/X2_sub
+    io_backend:
+      type: disk
+
+    gt_size: 192
+    use_hflip: false
+    use_rot: false
+
+    # data loader
+    num_worker_per_gpu: 2
+    batch_size_per_gpu: 2
+
+    prefetch_mode: cuda
+    pin_memory: true
+  test_1:  # the 1st test dataset
+    name: Set5
+    type: PairedImageDataset
+    dataroot_gt: datasets/Set5/HR
+    dataroot_lq: datasets/Set5/LR_bicubic/X2
+    filename_tmpl: '{}x2'
+    io_backend:
+      type: disk
+  test_2:  # the 2nd test dataset
+    name: Set14
+    type: PairedImageDataset
+    dataroot_gt: datasets/Set14/HR
+    dataroot_lq: datasets/Set14/LR_bicubic/X2
+    filename_tmpl: '{}x2'
+    io_backend:
+      type: disk
+  test_3:
+    name: BSDS100
+    type: PairedImageDataset
+    dataroot_gt: datasets/BSDS100/HR
+    dataroot_lq: datasets/BSDS100/LR_bicubic/X2
+    filename_tmpl: '{}x2'
+    io_backend:
+      type: disk
+  test_4:
+    name: Urban100
+    type: PairedImageDataset
+    dataroot_gt: datasets/Urban100/HR
+    dataroot_lq: datasets/Urban100/LR_bicubic/X2
+    filename_tmpl: '{}x2'
+    io_backend:
+      type: disk
+
+q_config:
+  quant: true
+  quant_train: false
+  a_bit: 6
+  w_bit: 6
+  per_channel: true
+  a_init: percentile    # L1_Loss
+  w_init: percentile
+  percentile: !!float 1e-4
+  weight_clip: !!float 1e-4
+  FP_scope: []
+  int8_scope: ['conv_first', 'conv_last']
+  calib_iter: 30
+  opt_w_lr: [!!float 5e-6, !!float 2e-6]
+  opt_a_lr: [!!float 5e-3, !!float 2e-3]
+  paq_w_opt_iter: 250
+  paq_a_opt_iter: 250
+  quant_calib: false
+  quant_pretrain: false
+
+# network structures
+network_g:
+  type: MSRResNet
+  num_in_ch: 3
+  num_out_ch: 3
+  num_feat: 64
+  num_block: 16
+  upscale: 2
+
+# path
+path:
+  pretrain_network_g: experiments/pretrained_models/MSRResNet/MSRResNet_x2_f64b16_DIV2K.pth
+  param_key_g: params
+  strict_load_g: true
+
+# validation settings
+val:
+  save_img: false
+  suffix: ~  # add suffix to saved images, if None, use exp name
+
+  metrics:
+    psnr: # metric name, can be arbitrary
+      type: calculate_psnr
+      crop_border: 4
+      test_y_channel: true
+    ssim:
+      type: calculate_ssim
+      crop_border: 4
+      test_y_channel: true
