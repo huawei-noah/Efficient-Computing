@@ -672,9 +672,15 @@ def train_loop(
             print('pruning with dense allocation: %f & T_end=%i' % (args.dense_allocation, T_end))
             print(pruner)
 
-
+    clear_best_flag = False
 
     for epoch in range(start_epoch, end_epoch):
+        if pruner is not None:
+            if not clear_best_flag and pruner.step > pruner.T_end:
+                best_prec1 = 0
+                clear_best_flag = True
+        
+        
         print("current_lr: ", optimizer.param_groups[0]['lr'])
 
         if logger is not None:
