@@ -1,0 +1,96 @@
+# general settings
+name: test_IPG_SR_x2
+model_type: IPGModel
+scale: 2
+num_gpu: 1
+manual_seed: 10
+
+datasets:
+  test_1:
+    name: Set5
+    type: PairedImageDataset
+    dataroot_gt: ../SRdata/BasicSR_SR_test/Set5/GTmod2
+    dataroot_lq: ../SRdata/BasicSR_SR_test/Set5/LRbicx2
+    io_backend:
+      type: disk
+
+  test_2:
+    name: Set14
+    type: PairedImageDataset
+    dataroot_gt: ../SRdata/BasicSR_SR_test/Set14/GTmod2
+    dataroot_lq: ../SRdata/BasicSR_SR_test/Set14/LRbicx2
+    io_backend:
+      type: disk
+
+  test_3:
+     name: BSDS100
+     type: PairedImageDataset
+     dataroot_gt: ../SRdata/BasicSR_SR_test/BSDS100/GTmod2
+     dataroot_lq: ../SRdata/BasicSR_SR_test/BSDS100/LRbicx2
+     io_backend:
+       type: disk
+
+  test_4:
+    name: Urban100
+    type: PairedImageDataset
+    dataroot_gt: ../SRdata/BasicSR_SR_test/Urban100/GTmod2
+    dataroot_lq: ../SRdata/BasicSR_SR_test/Urban100/LRbicx2
+    io_backend:
+      type: disk
+
+  test_5:
+      name: Manga109
+      type: PairedImageDataset
+      dataroot_gt: ../SRdata/BasicSR_SR_test/Manga109/GTmod2
+      dataroot_lq: ../SRdata/BasicSR_SR_test/Manga109/LRbicx2
+      io_backend:
+        type: disk
+
+
+# network structures
+network_g:
+  type: IPG
+  upscale: 2
+  in_chans: 3
+  img_size: 64
+  window_size: 16
+  img_range: 1.
+  depths: [6, 6, 6, 6, 6, 6]
+  embed_dim: 180
+  num_heads: [6, 6, 6, 6, 6, 6]
+  mlp_ratio: 4
+  upsampler: 'pixelshuffle'
+  resi_connection: '1conv'
+  graph_flags: [1, 1, 1, 1, 1, 1] # BOOL
+  stage_spec: [['GN','GS','GN','GS','GN','GS'],['GN','GS','GN','GS','GN','GS'],['GN','GS','GN','GS','GN','GS'],['GN','GS','GN','GS','GN','GS'],['GN','GS','GN','GS','GN','GS'],['GN','GS','GN','GS','GN','GS']]
+  dist_type: 'cossim'
+  top_k: 256
+  head_wise: 0 # BOOL
+  sample_size: 32
+  graph_switch: 1 # BOOL
+  flex_type: 'interdiff_plain'
+  FFNtype: 'basic-dwconv3'
+  conv_scale: 0.01
+  conv_type: 'dwconv3-gelu-conv1-ca'
+  diff_scales: [10,0,0,0,0,0]
+  fast_graph: 1
+
+# path
+path:
+  pretrain_network_g: ~
+  strict_load_g: true
+
+# validation settings
+val:
+  save_img: true
+  suffix: ~  # add suffix to saved images, if None, use exp name
+
+  metrics:
+    psnr: # metric name, can be arbitrary
+      type: calculate_psnr
+      crop_border: 2
+      test_y_channel: true
+    ssim:
+      type: calculate_ssim
+      crop_border: 2
+      test_y_channel: true
