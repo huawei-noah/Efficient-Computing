@@ -1,4 +1,4 @@
-# [CVPR2024 Oral] Image Processing GNN: Breaking Rigidity in Super-Resolution
+# [CVPR2024 Award & Oral] Image Processing GNN: Breaking Rigidity in Super-Resolution
 
 <p align="left">
 <a href="https://openaccess.thecvf.com/content/CVPR2024/papers/Tian_Image_Processing_GNN_Breaking_Rigidity_in_Super-Resolution_CVPR_2024_paper.pdf" alt="arXiv">
@@ -14,6 +14,16 @@ This is the official repo of our CVPR'24 paper Image Processing GNN: Breaking Ri
 
 ![scheme](imgs/scheme.png)
 
+## News
+
+11/5/2024: We released the test dataset on Huggingface. [Link](https://huggingface.co/datasets/yuchuantian/BasicSR_SR_test)
+
+7/6/2024: We opensourced the code & weights of IPG.
+
+6/19/2024: Our work got the **Best Student Runner-up Award** of CVPR'24!🎉🎉
+
+6/2/2024: We open-sourced [U-DiT](https://github.com/YuchuanTian/U-DiT), an efficient U-Net-style DiT variant.
+
 If you find this repo useful, please cite:
 
 ```
@@ -27,19 +37,13 @@ If you find this repo useful, please cite:
 }
 ```
 
-## News
 
-7/6/2024: We opensourced the code & weights of IPG.
-
-6/19/2024: Our work got the **Best Student Runner-up Award** of CVPR'24!🎉🎉
-
-6/2/2024: We open-sourced [U-DiT](https://github.com/YuchuanTian/U-DiT), an efficient U-Net-style DiT variant.
 
 ## Data Preparation
 
 Please follow this [link from CAT](https://drive.google.com/file/d/1TubDkirxl4qAWelfOnpwaSKoj3KLAIG4/view) to download the DF2K training dataset.
 
-Please follow this [link from BasicSR](https://github.com/XPixelGroup/BasicSR/blob/master/docs/DatasetPreparation.md) to download test datasets (Set5/Set14/B100/Urban100/Manga109).
+Please download test datasets from this [HuggingFace🤗 Link](https://huggingface.co/datasets/yuchuantian/BasicSR_SR_test) (Set5/Set14/B100/Urban100/Manga109).
 
 After data preparation, tree structure of the training dataset should be like:
 
